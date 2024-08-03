@@ -6,6 +6,7 @@
   "engines": {
     "vscode": "^1.92.0"
   },
+  "publisher": "assent",
   "categories": [
     "Other"
   ],
