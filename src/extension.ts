@@ -108,6 +108,7 @@ export function activate(context: vscode.ExtensionContext) {
 					return getJapanese();
 				}).catch(error => {
 					console.error("Error: ", error)
+					vscode.window.showInformationMessage("Error: ", error);
 					throw error
 				});
 		}
@@ -124,6 +125,7 @@ export function activate(context: vscode.ExtensionContext) {
 					return String(data.resultset.result.text);
 				}).catch(error => {
 					console.error("Error: ", error)
+					vscode.window.showInformationMessage("Error: ", error);
 					throw error
 				});
 		}
@@ -133,15 +135,33 @@ export function activate(context: vscode.ExtensionContext) {
 
 	
 	const exchangeLang = vscode.commands.registerCommand('textra_line_text.exchangeLang', async () => {
-		const selectedText = getText();
-		const context = await exchangeLange(selectedText.join('\n'));
-		setText(context.split('\n'));
+		await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "翻訳を取得中...",
+            cancellable: false
+		}, async (progress) => {
+            progress.report({ increment: 0 });
+			const selectedText = getText();
+			const context = await exchangeLange(selectedText.join('\n'));
+			setText(context.split('\n'));
+            progress.report({ increment: 100 });
+        });
+        vscode.window.showInformationMessage('翻訳完了!');
 	});
 
 	const exchangeLangOneLine = vscode.commands.registerCommand('textra_line_text.exchangeLangOneLine', async () => {
-		const selectedText = getText();
-		const context = await exchangeLange(selectedText.join(' '));
-		setText([context]);
+		await vscode.window.withProgress({
+            location: vscode.ProgressLocation.Notification,
+            title: "翻訳を取得中...",
+            cancellable: false
+		}, async (progress) => {
+			progress.report({ increment: 0 });
+			const selectedText = getText();
+			const context = await exchangeLange(selectedText.join(' '));
+			setText([context]);
+			progress.report({ increment: 100 });
+        });
+        vscode.window.showInformationMessage('翻訳完了!');
 	});
 
 	context.subscriptions.push(exchangeLang);
